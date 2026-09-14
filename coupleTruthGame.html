@@ -1,233 +1,222 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>情侣暧昧真心话小游戏</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:"微软雅黑",sans-serif;}
-        body{background:linear-gradient(135deg,#ffe6ee,#fef0f8);min-height:100vh;padding:20px;color:#333;}
-        .container{max-width:900px;margin:0 auto;background:#fff;border-radius:20px;padding:30px;box-shadow:0 8px 24px #00000015;}
-        h1{text-align:center;color:#e85b8c;margin-bottom:20px;font-size:28px;}
-        .tip{text-align:center;color:#999;margin-bottom:25px;}
-        .btn-group{display:flex;gap:15px;justify-content:center;margin:20px 0;flex-wrap:wrap;}
-        button{padding:12px 24px;border:none;border-radius:30px;background:#e85b8c;color:#fff;font-size:16px;cursor:pointer;transition:0.3s;}
-        button:hover{background:#d04878;transform:scale(1.03);}
-        button:disabled{background:#ccc;cursor:not-allowed;transform:none;}
-        .input-box{text-align:center;margin:20px 0;}
-        input{padding:12px 20px;border:2px solid #ffd6e2;border-radius:30px;width:260px;font-size:16px;outline:none;margin:8px 0;}
-        .player-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:15px;margin:25px 0;}
-        .player-card{padding:15px;border-radius:15px;background:#fef0f8;border:1px solid #ffd6e2;text-align:center;}
-        .player-role{font-size:24px;margin-bottom:8px;}
-        .player-name{font-weight:bold;color:#e85b8c;}
-        .player-turn{font-size:14px;color:#999;margin-top:5px;}
-        .question-box{margin:30px 0;padding:25px;border-radius:15px;background:#fff5f8;border:1px solid #ffd6e2;min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center;}
-        .question{font-size:18px;color:#333;line-height:1.8;}
-        .turn-info{text-align:center;font-size:17px;margin:15px 0;color:#d04878;font-weight:bold;}
-        .punish-box{margin:20px 0;padding:20px;border-radius:15px;background:#fff0f5;border:1px solid #ffb3c6;text-align:center;}
-        .punish-title{font-weight:bold;color:#d04878;font-size:17px;margin-bottom:10px;}
-        .hide{display:none !important;}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>情侣暧昧真心话【联机版】</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
+body{background:#fef0f6;padding:16px;color:#333}
+.container{max-width:600px;margin:0 auto}
+.btn{display:block;width:100%;border:none;border-radius:99px;padding:14px;font-size:18px;margin:10px 0;cursor:pointer}
+.btn-pink{background:#e85b9c;color:white;font-weight:bold}
+.btn-blue{background:#4285F4;color:white;font-weight:bold}
+.player-card{background:#fff;border-radius:20px;padding:20px;margin:12px 0;text-align:center;border:1px solid #f8c8e0}
+.question-box,.punish-box,.answer-box{background:#fff;border-radius:20px;padding:24px;margin:14px 0;text-align:center;border:1px solid #f8c8e0;font-size:22px}
+.answer-input-area{margin-top:16px}
+#answerInput{width:100%;border:1px solid #f0b8d8;border-radius:16px;padding:14px;font-size:18px;min-height:100px;outline:none}
+#submitAnswerBtn{background:#7b41c9;color:white}
+.tip-text{color:#c84078;font-size:16px;margin-top:8px;display:none}
+.loading{text-align:center;color:#d04080;font-size:16px;margin:10px}
+.room-tip{color:#884499;text-align:center;margin:4px 0 12px;font-size:15px;}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>💕 多人暧昧真心话小游戏 💕</h1>
-        <p class="tip">本地版本｜随机角色｜随机顺位｜奖励&惩罚机制</p>
-
-        <!-- 登录区域 -->
-        <div id="loginArea" class="input-box">
-            <input type="text" id="nickname" placeholder="输入你的昵称加入游戏" maxlength="10">
-            <div class="btn-group">
-                <button onclick="joinGame()">加入游戏</button>
-            </div>
-            <p style="color:#888;font-size:14px;">多个人可以在这台电脑开多个页面加入</p>
-        </div>
-
-        <!-- 游戏操作区 -->
-        <div id="gameArea" class="hide">
-            <div class="btn-group">
-                <button onclick="randomSort()">🎲 随机抽签排序</button>
-                <button onclick="nextQuestion()">💌 抽取问题+奖惩</button>
-                <button onclick="resetGame()">🔄 重置游戏</button>
-            </div>
-
-            <div class="turn-info" id="turnInfo">等待开始游戏...</div>
-
-            <div class="player-list" id="playerList"></div>
-
-            <div class="question-box">
-                <p class="question" id="questionText">点击【随机抽签排序】开启游戏，轮流答题解锁暧昧奖惩～</p>
-            </div>
-
-            <!-- 奖惩展示区域 -->
-            <div class="punish-box" id="punishBox">
-                <p class="punish-title">🎁 本轮奖励/惩罚</p>
-                <p id="punishText">等待抽取本轮奖惩...</p>
-            </div>
-        </div>
+<div class="container">
+    <h2 style="text-align:center;color:#d04080">情侣暧昧真心话【联机版】</h2>
+    <div class="loading" id="loadingText">正在同步联机数据...</div>
+    <div>
+        <input type="text" id="nameInput" placeholder="输入你的昵称加入游戏" style="width:100%;padding:12px;border-radius:12px;border:1px solid #f0b8d8;font-size:18px;margin:10px 0;">
+        <button class="btn btn-pink" onclick="addPlayer()">加入游戏</button>
     </div>
+    <button class="btn btn-blue" onclick="refreshRoom()">🔄 刷新联机状态</button>
+    <div class="room-tip">💡 多人联机提示：其他人操作后，请点【🔄 刷新联机状态】，才能看到最新玩家、题目和回答</div>
+    <button class="btn btn-pink" onclick="shufflePlayers()">随机抽签排序</button>
+    <button class="btn btn-pink" onclick="nextQuestion()">抽取问题+奖惩</button>
+    <button class="btn btn-pink" onclick="resetGame()">重置游戏</button>
 
-    <script>
-        // 可爱角色库
-        const roleList = [
-            '🐱 软萌小猫','🐰 温柔小兔','🐻 憨憨小熊','🐹 乖巧仓鼠',
-            '🦊 撩人小狐','🐼 奶盖熊猫','🐨 软糯考拉','🐷 甜甜小猪'
-        ];
+    <div id="turnInfo" style="font-size:24px;color:#d04080;font-weight:bold;margin:20px 0;text-align:center"></div>
+    <div id="playerList"></div>
+    <div id="questionBox" class="question-box"></div>
+    <div id="punishBox" class="punish-box"></div>
 
-        // 题库
-        const questionList = [
-            '你第一次见我，心里偷偷想的第一句话是什么？',
-            '你最喜欢我身上哪个小细节？',
-            '和我聊天的时候，你有没有偷偷心动过？',
-            '你最想和我做的一件小事是什么？',
-            '你觉得我最可爱的瞬间是什么时候？',
-            '你偷偷保存过我的哪张照片？',
-            '你对我的第一印象和现在印象差别大吗？',
-            '你最贪恋和我相处的哪种感觉？',
-            '有没有某一刻，你特别想抱抱我？',
-            '你觉得我们最甜的一个瞬间是哪次？',
-            '如果可以，你想每天和我黏在一起多久？',
-            '你最想听我对你说一句什么话？',
-            '我做什么事的时候最让你心动？',
-            '你有没有偷偷脑补过我们的未来？',
-            '你最喜欢我对你的哪种态度？',
-            '相处以来，你最心动的一个小细节是什么？',
-            '如果给今日的我打分，你会打多少分，为什么？',
-            '你最期待和我一起完成哪件小事？',
-            '你觉得我哪里最戳你的心？',
-            '有没有一瞬间差点被我撩到失控？'
-        ];
+    <!-- 回答输入区域 -->
+    <div class="answer-input-area">
+        <textarea id="answerInput" placeholder="在这里写下本轮你的回答..."></textarea>
+        <button id="submitAnswerBtn" class="btn" onclick="submitAnswer()">提交回答</button>
+        <div id="tipText" class="tip-text">✅回答已提交！请点击【抽取问题+奖惩】切换到下一位玩家</div>
+        <div id="savedAnswerBox" class="answer-box" style="display:none;"></div>
+    </div>
+</div>
 
-        // 奖励库
-        const rewardList = [
-            '奖励本轮玩家：向在场所有人说一句专属甜言蜜语',
-            '奖励本轮玩家：指定一人进行30秒隔空撒娇',
-            '奖励本轮玩家：分享一个偷偷心动的小秘密',
-            '奖励本轮玩家：夸遍在场每一位玩家的优点',
-            '奖励本轮玩家：许下一个和大家相关的温柔小愿望',
-            '奖励本轮玩家：模仿可爱小动物语气说话一轮',
-            '奖励本轮玩家：指定一人对自己说情话',
-            '奖励本轮玩家：公开自己的理想恋爱相处模式'
-        ];
+<script>
+const BIN_ID = "66e52a32ad19ca64cf8c3175";
+const MASTER_KEY = "$2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa";
 
-        // 惩罚库
-        const punishList = [
-            '小惩罚：本轮玩家深情朗读一句浪漫情话',
-            '小惩罚：说出自己一个恋爱小短板并承诺改正',
-            '小惩罚：模仿害羞心动的表情语气说话',
-            '小惩罚：指定一人说出自己最喜欢对方的一点',
-            '小惩罚：详细描述一次自己心动的瞬间',
-            '小惩罚：对全场玩家温柔表白一次',
-            '小惩罚：说说自己最想和大家一起做的事',
-            '小惩罚：用三句情话夸本轮的自己'
-        ];
+const questionList = [
+    "有没有某一刻，你特别想抱抱我？",
+    "第一次见我的时候，你心里是什么印象？",
+    "你最喜欢我身上哪一点？",
+    "如果可以，最想和我去哪里旅行？",
+    "你记忆里和我最甜的一件小事是什么？",
+    "你会因为什么事情偷偷想我？",
+    "你最想和我一起完成什么事？",
+    "你觉得两个人在一起最重要的是什么？"
+];
+const rewardList = [
+    "奖励：获得一次指定对方做一件小事的机会",
+    "奖励：对方夸你三句",
+    "奖励：你可以指定对方发一张自拍",
+    "奖励：对方满足你一个小愿望（不超出底线）"
+];
+const punishList = [
+    "小惩罚：对全场玩家温柔表白一次",
+    "小惩罚：说出你最近一次想到我的瞬间",
+    "小惩罚：用三种不同语气说我喜欢你",
+    "小惩罚：描述你理想中和我的周末一天"
+];
 
-        let myName = '';
-        let players = [];
-        let nowIndex = 0;
-        let isSort = false;
+// 从云端拉取游戏数据
+async function loadCloudData(){
+    try{
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{
+            headers:{"X-Master-Key":MASTER_KEY}
+        })
+        const json = await res.json();
+        return json.record;
+    }catch(e){
+        console.log("拉取云端失败，初始化新房间");
+        return {
+            players:[],
+            nowIndex:0,
+            isSort:false,
+            currentQuestion:"",
+            currentRule:"",
+            lastAnswer:""
+        };
+    }
+}
 
-        function getPlayers(){
-            let arr = localStorage.getItem('loveGamePlayers');
-            return arr ? JSON.parse(arr) : [];
-        }
-        function savePlayers(arr){
-            localStorage.setItem('loveGamePlayers',JSON.stringify(arr));
-        }
+// 保存数据上传云端
+async function saveCloudData(data){
+    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
+        method:"PUT",
+        headers:{
+            "X-Master-Key":MASTER_KEY,
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify(data)
+    })
+}
 
-        // 加入游戏
-        function joinGame(){
-            let name = document.getElementById('nickname').value.trim();
-            if(!name){alert('请输入昵称！');return;}
-            myName = name;
+// 渲染页面
+async function render(){
+    document.getElementById("loadingText").innerText="同步数据中...";
+    const state = await loadCloudData();
+    const list = state.players;
+    let html = "";
+    list.forEach((p,idx)=>{
+        html += `<div class="player-card"><div style="font-size:28px">${p.emoji} ${p.name}</div><div style="font-size:20px;color:#b74878">第${idx+1}位</div></div>`
+    })
+    document.getElementById("playerList").innerHTML = html;
+    if(state.isSort && list[state.nowIndex]){
+        document.getElementById("turnInfo").innerText = `本轮答题：${list[state.nowIndex].emoji} ${list[state.nowIndex].name}`;
+    }else{
+        document.getElementById("turnInfo").innerText = "";
+    }
+    document.getElementById("questionBox").innerText = state.currentQuestion;
+    document.getElementById("punishBox").innerText = state.currentRule;
+    if(state.lastAnswer){
+        document.getElementById("savedAnswerBox").style.display="block";
+        document.getElementById("savedAnswerBox").innerText = `📝本轮回答：${state.lastAnswer}`;
+    }else{
+        document.getElementById("savedAnswerBox").style.display="none";
+    }
+    document.getElementById("loadingText").innerText="✅联机已连接";
+}
 
-            let allPlayers = getPlayers();
-            if(allPlayers.find(item=>item.name===name)){
-                alert('该昵称已加入！');
-                document.getElementById('loginArea').classList.add('hide');
-                document.getElementById('gameArea').classList.remove('hide');
-                renderPlayer();
-                return;
-            }
-            let randomRole = roleList[Math.floor(Math.random()*roleList.length)];
-            allPlayers.push({
-                name:name,
-                role:randomRole,
-                turn:0
-            })
-            savePlayers(allPlayers);
+// 手动刷新房间
+async function refreshRoom(){
+    await render();
+    alert("已刷新房间最新数据！");
+}
 
-            document.getElementById('loginArea').classList.add('hide');
-            document.getElementById('gameArea').classList.remove('hide');
-            renderPlayer();
-        }
+// 添加玩家
+async function addPlayer(){
+    const name = document.getElementById("nameInput").value.trim();
+    if(!name)return alert("请输入昵称");
+    const state = await loadCloudData();
+    const emojis = ["🐱","🐶","🐰","🦊","🐼","🐨","🐹","🐯"];
+    state.players.push({name,emoji:emojis[Math.floor(Math.random()*emojis.length)]});
+    await saveCloudData(state);
+    document.getElementById("nameInput").value="";
+    render();
+}
 
-        function renderPlayer(){
-            let allPlayers = getPlayers();
-            let html = '';
-            allPlayers.forEach((item)=>{
-                html += `
-                <div class="player-card">
-                    <div class="player-role">${item.role}</div>
-                    <div class="player-name">${item.name}</div>
-                    <div class="player-turn">${item.turn>0 ? '第'+item.turn+'位' : '等待排序'}</div>
-                </div>
-                `
-            })
-            document.getElementById('playerList').innerHTML = html;
-        }
+// 打乱玩家顺序
+async function shufflePlayers(){
+    const state = await loadCloudData();
+    let arr = state.players;
+    for(let i=arr.length-1;i>0;i--){
+        let j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    state.isSort = true;
+    state.nowIndex = 0;
+    state.currentQuestion = "";
+    state.currentRule = "";
+    state.lastAnswer = "";
+    await saveCloudData(state);
+    render();
+}
 
-        //随机排序
-        function randomSort(){
-            let allPlayers = getPlayers();
-            if(allPlayers.length <2){alert('至少2人！');return;}
-            let arr = [...allPlayers];
-            for(let i=arr.length-1;i>0;i--){
-                let j = Math.floor(Math.random()*(i+1));
-                [arr[i],arr[j]] = [arr[j],arr[i]];
-            }
-            arr.forEach((item,index)=>item.turn = index+1);
-            savePlayers(arr);
-            isSort = true;
-            nowIndex = 0;
-            renderPlayer();
-            document.getElementById('turnInfo').innerText = '✅ 排序完成！从第一位开始轮流答题';
-            document.getElementById('questionText').innerText = '请第一位玩家点击抽取问题～';
-            document.getElementById('punishText').innerText = '等待抽取本轮奖惩...';
-        }
+// 抽取新题目奖惩
+async function nextQuestion(){
+    const state = await loadCloudData();
+    const allPlayers = state.players;
+    if(!state.isSort) return alert("请先随机抽签排序！");
+    let randomQ = questionList[Math.floor(Math.random()*questionList.length)];
+    let isReward = Math.random() > 0.5;
+    let randomRule = isReward ? rewardList[Math.floor(Math.random()*rewardList.length)] : punishList[Math.floor(Math.random()*punishList.length)];
+    state.currentQuestion = randomQ;
+    state.currentRule = randomRule;
+    state.lastAnswer = "";
+    await saveCloudData(state);
+    render();
+    document.getElementById("answerInput").value="";
+    document.getElementById("tipText").style.display="none";
+}
 
-        function nextQuestion(){
-            if(!isSort){alert('请先随机抽签排序！');return;}
-            let allPlayers = getPlayers();
-            let randomQ = questionList[Math.floor(Math.random()*questionList.length)];
-            let isReward = Math.random() > 0.5;
-            let randomRule = isReward 
-                ? rewardList[Math.floor(Math.random()*rewardList.length)]
-                : punishList[Math.floor(Math.random()*punishList.length)];
+// 提交回答（云端保存，所有人可见）
+async function submitAnswer(){
+    const ans = document.getElementById("answerInput").value.trim();
+    if(!ans) return alert("请输入回答内容");
+    const state = await loadCloudData();
+    state.lastAnswer = ans;
+    await saveCloudData(state);
+    render();
+    document.getElementById("tipText").style.display="block";
+}
 
-            let currentPlayer = allPlayers[nowIndex];
-            document.getElementById('turnInfo').innerText = `本轮答题：${currentPlayer.name} ${currentPlayer.role}`;
-            document.getElementById('questionText').innerText = randomQ;
-            document.getElementById('punishText').innerText = randomRule;
+// 全局重置游戏，清空全部联机房间数据
+async function resetGame(){
+    const emptyData = {
+        players:[],
+        nowIndex:0,
+        isSort:false,
+        currentQuestion:"",
+        currentRule:"",
+        lastAnswer:""
+    };
+    await saveCloudData(emptyData);
+    render();
+    document.getElementById("answerInput").value="";
+    document.getElementById("tipText").style.display="none";
+}
 
-            nowIndex++;
-            if(nowIndex >= allPlayers.length) nowIndex = 0;
-        }
-
-        function resetGame(){
-            localStorage.removeItem('loveGamePlayers');
-            myName = '';
-            players = [];
-            nowIndex = 0;
-            isSort = false;
-            document.getElementById('loginArea').classList.remove('hide');
-            document.getElementById('gameArea').classList.add('hide');
-            document.getElementById('nickname').value = '';
-        }
-
-        window.onload = function(){
-            renderPlayer();
-        }
-    </script>
+window.onload = function(){
+    render();
+}
+</script>
 </body>
 </html>
