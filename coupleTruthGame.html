@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情侣暧昧真心话小游戏</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"微软雅黑",sans-serif;}
+        body{background:linear-gradient(135deg,#ffe6ee,#fef0f8);min-height:100vh;padding:20px;color:#333;}
+        .container{max-width:900px;margin:0 auto;background:#fff;border-radius:20px;padding:30px;box-shadow:0 8px 24px #00000015;}
+        h1{text-align:center;color:#e85b8c;margin-bottom:20px;font-size:28px;}
+        .tip{text-align:center;color:#999;margin-bottom:25px;}
+        .btn-group{display:flex;gap:15px;justify-content:center;margin:20px 0;flex-wrap:wrap;}
+        button{padding:12px 24px;border:none;border-radius:30px;background:#e85b8c;color:#fff;font-size:16px;cursor:pointer;transition:0.3s;}
+        button:hover{background:#d04878;transform:scale(1.03);}
+        button:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+        .input-box{text-align:center;margin:20px 0;}
+        input{padding:12px 20px;border:2px solid #ffd6e2;border-radius:30px;width:260px;font-size:16px;outline:none;margin:8px 0;}
+        .player-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:15px;margin:25px 0;}
+        .player-card{padding:15px;border-radius:15px;background:#fef0f8;border:1px solid #ffd6e2;text-align:center;}
+        .player-role{font-size:24px;margin-bottom:8px;}
+        .player-name{font-weight:bold;color:#e85b8c;}
+        .player-turn{font-size:14px;color:#999;margin-top:5px;}
+        .question-box{margin:30px 0;padding:25px;border-radius:15px;background:#fff5f8;border:1px solid #ffd6e2;min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center;}
+        .question{font-size:18px;color:#333;line-height:1.8;}
+        .turn-info{text-align:center;font-size:17px;margin:15px 0;color:#d04878;font-weight:bold;}
+        .punish-box{margin:20px 0;padding:20px;border-radius:15px;background:#fff0f5;border:1px solid #ffb3c6;text-align:center;}
+        .punish-title{font-weight:bold;color:#d04878;font-size:17px;margin-bottom:10px;}
+        .hide{display:none !important;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💕 多人暧昧真心话小游戏 💕</h1>
+        <p class="tip">本地版本｜随机角色｜随机顺位｜奖励&惩罚机制</p>
+
+        <!-- 登录区域 -->
+        <div id="loginArea" class="input-box">
+            <input type="text" id="nickname" placeholder="输入你的昵称加入游戏" maxlength="10">
+            <div class="btn-group">
+                <button onclick="joinGame()">加入游戏</button>
+            </div>
+            <p style="color:#888;font-size:14px;">多个人可以在这台电脑开多个页面加入</p>
+        </div>
+
+        <!-- 游戏操作区 -->
+        <div id="gameArea" class="hide">
+            <div class="btn-group">
+                <button onclick="randomSort()">🎲 随机抽签排序</button>
+                <button onclick="nextQuestion()">💌 抽取问题+奖惩</button>
+                <button onclick="resetGame()">🔄 重置游戏</button>
+            </div>
+
+            <div class="turn-info" id="turnInfo">等待开始游戏...</div>
+
+            <div class="player-list" id="playerList"></div>
+
+            <div class="question-box">
+                <p class="question" id="questionText">点击【随机抽签排序】开启游戏，轮流答题解锁暧昧奖惩～</p>
+            </div>
+
+            <!-- 奖惩展示区域 -->
+            <div class="punish-box" id="punishBox">
+                <p class="punish-title">🎁 本轮奖励/惩罚</p>
+                <p id="punishText">等待抽取本轮奖惩...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 可爱角色库
+        const roleList = [
+            '🐱 软萌小猫','🐰 温柔小兔','🐻 憨憨小熊','🐹 乖巧仓鼠',
+            '🦊 撩人小狐','🐼 奶盖熊猫','🐨 软糯考拉','🐷 甜甜小猪'
+        ];
+
+        // 题库
+        const questionList = [
+            '你第一次见我，心里偷偷想的第一句话是什么？',
+            '你最喜欢我身上哪个小细节？',
+            '和我聊天的时候，你有没有偷偷心动过？',
+            '你最想和我做的一件小事是什么？',
+            '你觉得我最可爱的瞬间是什么时候？',
+            '你偷偷保存过我的哪张照片？',
+            '你对我的第一印象和现在印象差别大吗？',
+            '你最贪恋和我相处的哪种感觉？',
+            '有没有某一刻，你特别想抱抱我？',
+            '你觉得我们最甜的一个瞬间是哪次？',
+            '如果可以，你想每天和我黏在一起多久？',
+            '你最想听我对你说一句什么话？',
+            '我做什么事的时候最让你心动？',
+            '你有没有偷偷脑补过我们的未来？',
+            '你最喜欢我对你的哪种态度？',
+            '相处以来，你最心动的一个小细节是什么？',
+            '如果给今日的我打分，你会打多少分，为什么？',
+            '你最期待和我一起完成哪件小事？',
+            '你觉得我哪里最戳你的心？',
+            '有没有一瞬间差点被我撩到失控？'
+        ];
+
+        // 奖励库
+        const rewardList = [
+            '奖励本轮玩家：向在场所有人说一句专属甜言蜜语',
+            '奖励本轮玩家：指定一人进行30秒隔空撒娇',
+            '奖励本轮玩家：分享一个偷偷心动的小秘密',
+            '奖励本轮玩家：夸遍在场每一位玩家的优点',
+            '奖励本轮玩家：许下一个和大家相关的温柔小愿望',
+            '奖励本轮玩家：模仿可爱小动物语气说话一轮',
+            '奖励本轮玩家：指定一人对自己说情话',
+            '奖励本轮玩家：公开自己的理想恋爱相处模式'
+        ];
+
+        // 惩罚库
+        const punishList = [
+            '小惩罚：本轮玩家深情朗读一句浪漫情话',
+            '小惩罚：说出自己一个恋爱小短板并承诺改正',
+            '小惩罚：模仿害羞心动的表情语气说话',
+            '小惩罚：指定一人说出自己最喜欢对方的一点',
+            '小惩罚：详细描述一次自己心动的瞬间',
+            '小惩罚：对全场玩家温柔表白一次',
+            '小惩罚：说说自己最想和大家一起做的事',
+            '小惩罚：用三句情话夸本轮的自己'
+        ];
+
+        let myName = '';
+        let players = [];
+        let nowIndex = 0;
+        let isSort = false;
+
+        function getPlayers(){
+            let arr = localStorage.getItem('loveGamePlayers');
+            return arr ? JSON.parse(arr) : [];
+        }
+        function savePlayers(arr){
+            localStorage.setItem('loveGamePlayers',JSON.stringify(arr));
+        }
+
+        // 加入游戏
+        function joinGame(){
+            let name = document.getElementById('nickname').value.trim();
+            if(!name){alert('请输入昵称！');return;}
+            myName = name;
+
+            let allPlayers = getPlayers();
+            if(allPlayers.find(item=>item.name===name)){
+                alert('该昵称已加入！');
+                document.getElementById('loginArea').classList.add('hide');
+                document.getElementById('gameArea').classList.remove('hide');
+                renderPlayer();
+                return;
+            }
+            let randomRole = roleList[Math.floor(Math.random()*roleList.length)];
+            allPlayers.push({
+                name:name,
+                role:randomRole,
+                turn:0
+            })
+            savePlayers(allPlayers);
+
+            document.getElementById('loginArea').classList.add('hide');
+            document.getElementById('gameArea').classList.remove('hide');
+            renderPlayer();
+        }
+
+        function renderPlayer(){
+            let allPlayers = getPlayers();
+            let html = '';
+            allPlayers.forEach((item)=>{
+                html += `
+                <div class="player-card">
+                    <div class="player-role">${item.role}</div>
+                    <div class="player-name">${item.name}</div>
+                    <div class="player-turn">${item.turn>0 ? '第'+item.turn+'位' : '等待排序'}</div>
+                </div>
+                `
+            })
+            document.getElementById('playerList').innerHTML = html;
+        }
+
+        //随机排序
+        function randomSort(){
+            let allPlayers = getPlayers();
+            if(allPlayers.length <2){alert('至少2人！');return;}
+            let arr = [...allPlayers];
+            for(let i=arr.length-1;i>0;i--){
+                let j = Math.floor(Math.random()*(i+1));
+                [arr[i],arr[j]] = [arr[j],arr[i]];
+            }
+            arr.forEach((item,index)=>item.turn = index+1);
+            savePlayers(arr);
+            isSort = true;
+            nowIndex = 0;
+            renderPlayer();
+            document.getElementById('turnInfo').innerText = '✅ 排序完成！从第一位开始轮流答题';
+            document.getElementById('questionText').innerText = '请第一位玩家点击抽取问题～';
+            document.getElementById('punishText').innerText = '等待抽取本轮奖惩...';
+        }
+
+        function nextQuestion(){
+            if(!isSort){alert('请先随机抽签排序！');return;}
+            let allPlayers = getPlayers();
+            let randomQ = questionList[Math.floor(Math.random()*questionList.length)];
+            let isReward = Math.random() > 0.5;
+            let randomRule = isReward 
+                ? rewardList[Math.floor(Math.random()*rewardList.length)]
+                : punishList[Math.floor(Math.random()*punishList.length)];
+
+            let currentPlayer = allPlayers[nowIndex];
+            document.getElementById('turnInfo').innerText = `本轮答题：${currentPlayer.name} ${currentPlayer.role}`;
+            document.getElementById('questionText').innerText = randomQ;
+            document.getElementById('punishText').innerText = randomRule;
+
+            nowIndex++;
+            if(nowIndex >= allPlayers.length) nowIndex = 0;
+        }
+
+        function resetGame(){
+            localStorage.removeItem('loveGamePlayers');
+            myName = '';
+            players = [];
+            nowIndex = 0;
+            isSort = false;
+            document.getElementById('loginArea').classList.remove('hide');
+            document.getElementById('gameArea').classList.add('hide');
+            document.getElementById('nickname').value = '';
+        }
+
+        window.onload = function(){
+            renderPlayer();
+        }
+    </script>
+</body>
+</html>
