@@ -33,7 +33,6 @@
     <div class="container">
         <h1>💕 多人暧昧真心话小游戏 💕</h1>
         <p class="tip">本地版本｜随机角色｜随机顺位｜奖励&惩罚机制</p>
-
         <!-- 登录区域 -->
         <div id="loginArea" class="input-box">
             <input type="text" id="nickname" placeholder="输入你的昵称加入游戏" maxlength="10">
@@ -42,7 +41,6 @@
             </div>
             <p style="color:#888;font-size:14px;">多个人可以在这台电脑开多个页面加入</p>
         </div>
-
         <!-- 游戏操作区 -->
         <div id="gameArea" class="hide">
             <div class="btn-group">
@@ -50,15 +48,11 @@
                 <button onclick="nextQuestion()">💌 抽取问题+奖惩</button>
                 <button onclick="resetGame()">🔄 重置游戏</button>
             </div>
-
             <div class="turn-info" id="turnInfo">等待开始游戏...</div>
-
             <div class="player-list" id="playerList"></div>
-
             <div class="question-box">
                 <p class="question" id="questionText">点击【随机抽签排序】开启游戏，轮流答题解锁暧昧奖惩～</p>
             </div>
-
             <!-- 奖惩展示区域 -->
             <div class="punish-box" id="punishBox">
                 <p class="punish-title">🎁 本轮奖励/惩罚</p>
@@ -66,14 +60,12 @@
             </div>
         </div>
     </div>
-
     <script>
         // 可爱角色库
         const roleList = [
             '🐱 软萌小猫','🐰 温柔小兔','🐻 憨憨小熊','🐹 乖巧仓鼠',
             '🦊 撩人小狐','🐼 奶盖熊猫','🐨 软糯考拉','🐷 甜甜小猪'
         ];
-
         // 题库
         const questionList = [
             '你第一次见我，心里偷偷想的第一句话是什么？',
@@ -97,7 +89,6 @@
             '你觉得我哪里最戳你的心？',
             '有没有一瞬间差点被我撩到失控？'
         ];
-
         // 奖励库
         const rewardList = [
             '奖励本轮玩家：向在场所有人说一句专属甜言蜜语',
@@ -109,7 +100,6 @@
             '奖励本轮玩家：指定一人对自己说情话',
             '奖励本轮玩家：公开自己的理想恋爱相处模式'
         ];
-
         // 惩罚库
         const punishList = [
             '小惩罚：本轮玩家深情朗读一句浪漫情话',
@@ -121,12 +111,10 @@
             '小惩罚：说说自己最想和大家一起做的事',
             '小惩罚：用三句情话夸本轮的自己'
         ];
-
         let myName = '';
         let players = [];
         let nowIndex = 0;
         let isSort = false;
-
         function getPlayers(){
             let arr = localStorage.getItem('loveGamePlayers');
             return arr ? JSON.parse(arr) : [];
@@ -134,13 +122,11 @@
         function savePlayers(arr){
             localStorage.setItem('loveGamePlayers',JSON.stringify(arr));
         }
-
         // 加入游戏
         function joinGame(){
             let name = document.getElementById('nickname').value.trim();
             if(!name){alert('请输入昵称！');return;}
             myName = name;
-
             let allPlayers = getPlayers();
             if(allPlayers.find(item=>item.name===name)){
                 alert('该昵称已加入！');
@@ -156,12 +142,10 @@
                 turn:0
             })
             savePlayers(allPlayers);
-
             document.getElementById('loginArea').classList.add('hide');
             document.getElementById('gameArea').classList.remove('hide');
             renderPlayer();
         }
-
         function renderPlayer(){
             let allPlayers = getPlayers();
             let html = '';
@@ -176,7 +160,6 @@
             })
             document.getElementById('playerList').innerHTML = html;
         }
-
         //随机排序
         function randomSort(){
             let allPlayers = getPlayers();
@@ -195,7 +178,6 @@
             document.getElementById('questionText').innerText = '请第一位玩家点击抽取问题～';
             document.getElementById('punishText').innerText = '等待抽取本轮奖惩...';
         }
-
         function nextQuestion(){
             if(!isSort){alert('请先随机抽签排序！');return;}
             let allPlayers = getPlayers();
@@ -204,16 +186,13 @@
             let randomRule = isReward 
                 ? rewardList[Math.floor(Math.random()*rewardList.length)]
                 : punishList[Math.floor(Math.random()*punishList.length)];
-
             let currentPlayer = allPlayers[nowIndex];
             document.getElementById('turnInfo').innerText = `本轮答题：${currentPlayer.name} ${currentPlayer.role}`;
             document.getElementById('questionText').innerText = randomQ;
             document.getElementById('punishText').innerText = randomRule;
-
             nowIndex++;
             if(nowIndex >= allPlayers.length) nowIndex = 0;
         }
-
         function resetGame(){
             localStorage.removeItem('loveGamePlayers');
             myName = '';
@@ -224,7 +203,6 @@
             document.getElementById('gameArea').classList.add('hide');
             document.getElementById('nickname').value = '';
         }
-
         window.onload = function(){
             renderPlayer();
         }
